@@ -19,7 +19,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
         System.out.println(oAuth2User);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
@@ -36,17 +35,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return null;
         }
-
         String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-        UserEntity exisitData = userRepository.findByUsername(username);
+        UserEntity existData = userRepository.findByUsername(username);
 
-        if(exisitData == null){
-            UserEntity newUserEntity = new UserEntity();
-            newUserEntity.setUsername(oAuth2Response.getName());
-            newUserEntity.setEmail(oAuth2Response.getEmail());
-            newUserEntity.setRole("ROLE_USER");
+        if (existData == null) {
 
-            userRepository.save(newUserEntity);
+            UserEntity userEntity = new UserEntity();
+            userEntity.setUsername(username);
+            userEntity.setEmail(oAuth2Response.getEmail());
+            userEntity.setName(oAuth2Response.getName());
+            userEntity.setRole("ROLE_USER");
+
+            userRepository.save(userEntity);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername(username);
@@ -55,16 +55,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return new CustomOAuth2User(userDTO);
         }
-        else{
-            exisitData.setName(oAuth2Response.getName());
-            exisitData.setRole("ROLE_USER");
+        else {
 
-            userRepository.save(exisitData);
+            existData.setEmail(oAuth2Response.getEmail());
+            existData.setName(oAuth2Response.getName());
+
+            userRepository.save(existData);
 
             UserDTO userDTO = new UserDTO();
-            userDTO.setUsername(username);
+            userDTO.setUsername(existData.getUsername());
             userDTO.setName(oAuth2Response.getName());
-            userDTO.setRole("ROLE_USER");
+            userDTO.setRole(existData.getRole());
 
             return new CustomOAuth2User(userDTO);
         }
