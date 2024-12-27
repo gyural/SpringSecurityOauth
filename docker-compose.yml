@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: security
+      MYSQL_USER: security
+      MYSQL_PASSWORD: security
+    ports:
+      - "3306:3306"
